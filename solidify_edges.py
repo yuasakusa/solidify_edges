@@ -83,7 +83,7 @@ class MeshSolidifyEdges(bpy.types.Operator):
 
 
 def menu_func(self, context):
-    self.layout.operator(MeshSolidifyEdges.bl_idname)
+    self.layout.operator(MeshSolidifyEdges.bl_idname, text="Solidify Edges...")
 
 
 def register():
