@@ -1,12 +1,12 @@
 bl_info = {
-    "name": "Poor Man's DupliEdges",
+    "name": "Solidify Edges",
     "description":
-        "Copies a base object along the edges of a specified mesh object.",
+        "Creates a copy of an object for each edge of the active mesh object.",
     "author": "Yu Asakusa",
     "version": (1, 0),
-    "category": "Object",
+    "category": "Mesh",
     "location":
-        "3D View > Object > DupliEdges",
+        "3D View > Object > Solidify Edges",
 }
 
 
@@ -15,27 +15,30 @@ import math
 from mathutils import *
 
 
-class DupliEdgesOperator(bpy.types.Operator):
-    """Copy a base object along the edges of a specified mesh object."""
-    bl_idname = "object.dupliedges_operator"
-    bl_label = "DupliEdges"
+class MeshSolidifyEdges(bpy.types.Operator):
+    """Create a copy of an object for each edge of the active mesh object."""
+    bl_idname = "mesh.solidify_edges"
+    bl_label = "Solidify Edges"
     bl_options = {'REGISTER', 'UNDO'}
+
+    base_ob_name = bpy.props.StringProperty(
+        name="Base", description="Object to make copies of")
+
+    @classmethod
+    def poll(cls, context):
+        shape = context.active_object
+        return shape is not None and shape.type == 'MESH'
 
     def execute(self, context):
         scene = context.scene
         shape = context.active_object
         if shape is None or shape.type != 'MESH':
             raise TypeError('A mesh object must be active')
-        base = None
-        for obj in context.selected_objects:
-            # The following line uses != instead of 'is not', and this is correct.
-            # See http://blender.stackexchange.com/a/5955
-            if obj != shape:
-                if base is not None:
-                    raise ValueError('Only one object must be selected')
-                base = obj
+        base = context.blend_data.objects.get(self.base_ob_name)
+        # The following line uses != instead of 'is not', and this is correct.
+        # See http://blender.stackexchange.com/a/5955
         if base is None:
-            raise ValueError('Only one object must be selected')
+            return {'FINISHED'}
         orig_mat = base.matrix_world.to_3x3()
         axis = orig_mat * Vector((0.0, 0.0, 1.0))
         axis.normalize()
@@ -49,6 +52,7 @@ class DupliEdgesOperator(bpy.types.Operator):
             settings='PREVIEW', calc_tessface=False)
         mesh.transform(shape.matrix_world)
         vertices = mesh.vertices
+        bpy.ops.object.select_all(action='DESELECT')
         for edge in mesh.edges:
             v0 = vertices[edge.vertices[0]].co
             v1 = vertices[edge.vertices[1]].co
@@ -63,22 +67,32 @@ class DupliEdgesOperator(bpy.types.Operator):
             mat = rot * Matrix.Scale(length, 3, (0.0, 0.0, 1.0)) * orig_mat
             mat = Matrix.Translation(v0) * mat.to_4x4()
             new_obj.matrix_world = mat
+            new_obj.select = True
             scene.objects.link(new_obj)
         bpy.data.meshes.remove(mesh)
         return {'FINISHED'}
 
+    def invoke(self, context, event):
+        wm = context.window_manager
+        return wm.invoke_props_dialog(self)
+
+    def draw(self, context):
+        layout = self.layout
+        col = layout.column()
+        col.prop_search(self, 'base_ob_name', context.blend_data, 'objects')
+
 
 def menu_func(self, context):
-    self.layout.operator(DupliEdgesOperator.bl_idname)
+    self.layout.operator(MeshSolidifyEdges.bl_idname)
 
 
 def register():
-    bpy.utils.register_class(DupliEdgesOperator)
+    bpy.utils.register_class(MeshSolidifyEdges)
     bpy.types.VIEW3D_MT_object.append(menu_func)
 
 
 def unregister():
-    bpy.utils.unregister_class(DupliEdgesOperator)
+    bpy.utils.unregister_class(MeshSolidifyEdges)
     bpy.types.VIEW3D_MT_object.remove(menu_func)
 
 
