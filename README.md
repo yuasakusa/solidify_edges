@@ -37,3 +37,7 @@ For each edge of the target object, a copy of the base object is created.  This 
 ## Related addon
 
 * [Solidify Wireframe](http://wiki.blender.org/index.php/Extensions:2.6/Py/Scripts/Modeling/Solidify_Wireframe) by Yorik is another addon which turns the edges of a mesh into a mesh object.  It produces a cubical mesh instead of copies of a cylinder.
+
+## License
+
+Solidify Edges is licensed under GNU General Public License Version 3.

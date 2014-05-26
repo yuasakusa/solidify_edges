@@ -1,3 +1,4 @@
 .gitattributes text
 *.md text
 *.py text
+*.txt text
