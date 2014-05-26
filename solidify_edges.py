@@ -26,13 +26,13 @@ class MeshSolidifyEdges(bpy.types.Operator):
 
     @classmethod
     def poll(cls, context):
-        shape = context.active_object
-        return shape is not None and shape.type == 'MESH'
+        target = context.active_object
+        return target is not None and target.type == 'MESH'
 
     def execute(self, context):
         scene = context.scene
-        shape = context.active_object
-        if shape is None or shape.type != 'MESH':
+        target = context.active_object
+        if target is None or target.type != 'MESH':
             raise TypeError('A mesh object must be active')
         base = context.blend_data.objects.get(self.base_ob_name)
         # The following line uses != instead of 'is not', and this is correct.
@@ -47,25 +47,26 @@ class MeshSolidifyEdges(bpy.types.Operator):
         # rot1 maps 'axis' to +Z
         rot1 = azimuth1 * colatitude1.transposed() * azimuth1.transposed()
         orig_mat = rot1 * orig_mat
-        mesh = shape.to_mesh(
+        mesh = target.to_mesh(
             scene=scene, apply_modifiers=True,
             settings='PREVIEW', calc_tessface=False)
-        mesh.transform(shape.matrix_world)
+        mesh.transform(target.matrix_world)
         vertices = mesh.vertices
         bpy.ops.object.select_all(action='DESELECT')
         for edge in mesh.edges:
             v0 = vertices[edge.vertices[0]].co
             v1 = vertices[edge.vertices[1]].co
-            direction = v1 - v0
-            length = direction.length
+            location = 0.5 * (v0 + v1)
+            direction = 0.5 * (v1 - v0)
+            scale = direction.length
             direction.normalize()
             new_obj = base.copy()
             colatitude = Matrix.Rotation(math.acos(direction.z), 3, 'Y')
             azimuth = Matrix.Rotation(math.atan2(direction.y, direction.x), 3, 'Z')
             # rot maps +Z to 'direction'
             rot = azimuth * colatitude * azimuth.transposed()
-            mat = rot * Matrix.Scale(length, 3, (0.0, 0.0, 1.0)) * orig_mat
-            mat = Matrix.Translation(v0) * mat.to_4x4()
+            mat = rot * Matrix.Scale(scale, 3, (0.0, 0.0, 1.0)) * orig_mat
+            mat = Matrix.Translation(location) * mat.to_4x4()
             new_obj.matrix_world = mat
             new_obj.select = True
             scene.objects.link(new_obj)
