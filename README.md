@@ -1,6 +1,6 @@
 # Solidify Edges
 
-This is an addon for [Blender](http://www.blender.org/).  It provides a command which turns every edge of a specified mesh object into a copy of a cylinder or some other object.
+This is an addon for [Blender](http://www.blender.org/).  It provides a command which makes a copy of a cylinder (or some other object) for each edge of a specified mesh object.
 
 ## How to install and enable
 
