@@ -53,8 +53,6 @@ class MeshSolidifyEdges(bpy.types.Operator):
         if target is None or target.type != 'MESH':
             raise TypeError('A mesh object must be active')
         base = context.blend_data.objects.get(self.base_ob_name)
-        # The following line uses != instead of 'is not', and this is correct.
-        # See http://blender.stackexchange.com/a/5955
         if base is None:
             return {'FINISHED'}
         orig_mat = base.matrix_world.to_3x3()
