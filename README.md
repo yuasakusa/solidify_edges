@@ -1,7 +1,5 @@
 # Solidify Edges
 
-***Warning: Blender crashes occasionally with this addon (issue #1).  Until this bug is investigated and fixed, I do not recommend to use this addon.***
-
 This is an addon for [Blender](http://www.blender.org/).  It provides a command which makes a copy of a cylinder (or some other object) for each edge of a specified mesh object.
 
 ## How to install and enable
@@ -38,6 +36,7 @@ For each edge of the target object, a copy of the base object is created.  This 
 
 * The copied objects have arbitrary rotations around their Z-axis.  This may be a problem if the base object does not have cylindrical symmetry around its Z-axis.
 * If the base object is not mirror symmetric about its local XY-plane, the result is affected by the order in which the two vertices of an edge are stored, which usually has no meaning.
+* The Solidify Edges command is a little unusual in Blender in that it does not stay in the redo panel after it is invoked.  This is a dirty hack to avoid a [crash bug](https://github.com/yuasakusa/solidify_edges/issues/1).  This behavior may change if I find a proper way to fix it.
 
 ## Related addon
 
