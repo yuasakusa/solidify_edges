@@ -33,6 +33,18 @@ import math
 from mathutils import *
 
 
+def rotation_matrix(v):
+    """Return one of the 3x3 rotation matrices which map (0,0,1) to v.normalized().
+
+    Note that there are many such matrices; it is not specified which
+    of them is returned.  v must be nonzero.
+    """
+    direction = v.normalized()
+    colatitude = Matrix.Rotation(math.acos(direction.z), 3, 'Y')
+    azimuth = Matrix.Rotation(math.atan2(direction.y, direction.x), 3, 'Z')
+    return azimuth * colatitude * azimuth.transposed()
+
+
 class MeshSolidifyEdges(bpy.types.Operator):
     """Create a copy of an object for each edge of the active mesh object."""
     bl_idname = "mesh.solidify_edges"
@@ -57,12 +69,7 @@ class MeshSolidifyEdges(bpy.types.Operator):
             return {'FINISHED'}
         orig_mat = base.matrix_world.to_3x3()
         axis = orig_mat * Vector((0.0, 0.0, 1.0))
-        axis.normalize()
-        colatitude1 = Matrix.Rotation(math.acos(axis.z), 3, 'Y')
-        azimuth1 = Matrix.Rotation(math.atan2(axis.y, axis.x), 3, 'Z')
-        # rot1 maps 'axis' to +Z
-        rot1 = azimuth1 * colatitude1.transposed() * azimuth1.transposed()
-        orig_mat = rot1 * orig_mat
+        orig_mat = rotation_matrix(axis).transposed() * orig_mat
         mesh = target.to_mesh(
             scene=scene, apply_modifiers=True,
             settings='PREVIEW', calc_tessface=False)
@@ -75,13 +82,9 @@ class MeshSolidifyEdges(bpy.types.Operator):
             location = 0.5 * (v0 + v1)
             direction = 0.5 * (v1 - v0)
             scale = direction.length
-            direction.normalize()
             new_obj = base.copy()
-            colatitude = Matrix.Rotation(math.acos(direction.z), 3, 'Y')
-            azimuth = Matrix.Rotation(math.atan2(direction.y, direction.x), 3, 'Z')
-            # rot maps +Z to 'direction'
-            rot = azimuth * colatitude * azimuth.transposed()
-            mat = rot * Matrix.Scale(scale, 3, (0.0, 0.0, 1.0)) * orig_mat
+            mat = (rotation_matrix(direction) *
+                   Matrix.Scale(scale, 3, (0.0, 0.0, 1.0)) * orig_mat)
             mat = Matrix.Translation(location) * mat.to_4x4()
             new_obj.matrix_world = mat
             new_obj.select = True
