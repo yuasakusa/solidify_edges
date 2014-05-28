@@ -21,7 +21,7 @@ bl_info = {
     "description":
         "Creates a copy of an object for each edge of the active mesh object.",
     "author": "Yu Asakusa",
-    "version": (1, 0),
+    "version": (1, 0, 1),
     "category": "Mesh",
     "location":
         "3D View > Object > Solidify Edges",
