@@ -49,7 +49,7 @@ class MeshSolidifyEdges(bpy.types.Operator):
     """Create a copy of an object for each edge of the active mesh object."""
     bl_idname = "mesh.solidify_edges"
     bl_label = "Solidify Edges"
-    bl_options = {'REGISTER', 'UNDO'}
+    bl_options = {'UNDO'}
 
     base_ob_name = bpy.props.StringProperty(
         name="Base", description="Object to make copies of")
