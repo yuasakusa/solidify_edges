@@ -1,5 +1,7 @@
 # Solidify Edges
 
+***Warning: Blender crashes occasionally with this addon (issue #1).  Until this bug is investigated and fixed, I do not recommend to use this addon.***
+
 This is an addon for [Blender](http://www.blender.org/).  It provides a command which makes a copy of a cylinder (or some other object) for each edge of a specified mesh object.
 
 ## How to install and enable
