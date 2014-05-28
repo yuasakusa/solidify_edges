@@ -22,6 +22,9 @@ Suppose that you would like to solidify the edges of a target mesh object with c
 4. In the dialog box, select the ID of the cylinder which you created in step 1.
 5. Press OK.
 6. If you do not wish to render the cylinder created in step 1, delete it or set it to hide_render (the camera icon in the Outliner window).
+7. If you do not wish to render the target mesh object, delete it or set it to hide_render.
+
+Tip: If you would like to render the _vertices_ of the target mesh as copies of a certain object, you may want to check [DupliVerts](http://wiki.blender.org/index.php/Doc:2.6/Manual/Modeling/Objects/Duplication/DupliVerts) in Blender.
 
 ## Technical description
 
